@@ -3293,14 +3293,17 @@ function repository_download_selected_files($context, string $component, string 
 
         $storedfile = $fs->get_file($context->id, $component, $filearea, $itemid, $filepath, $filename);
         // If it is empty we are downloading a directory.
-        $archivefile = $storedfile->get_filename();
+        $archivefile = $storedfile ? $storedfile->get_filename() : clean_filename($filename);
         if (!$filename || $filename == '.' ) {
             $foldername = explode('/', trim($filepath, '/'));
             $folder = trim(array_pop($foldername), '/');
             $archivefile = $folder ?? '/';
+            if (($archivefile === '' || $archivefile === '/') && !$storedfile) {
+                $archivefile = get_string('files');
+            }
         }
 
-        $filestoarchive[$archivefile] = $storedfile;
+        $filestoarchive[$archivefile] = $storedfile ?: null;
     }
     $zippedfile = get_string('files') . '.zip';
     if ($zipper->archive_to_storage(
