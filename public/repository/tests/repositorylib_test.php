@@ -213,6 +213,36 @@ final class repositorylib_test extends \advanced_testcase {
         $this->assertEquals(2, count($areafiles));
     }
 
+/**
+     * Downloading from an empty draft area should return false rather than throwing.
+     *
+     * This mirrors the request the file manager sends when the download button is used while the
+     * area is empty: a single entry pointing at the (non-existent) root folder. The function must
+     * return false so the caller can notify the user that there is nothing to download.
+     *
+     * @covers ::repository_download_selected_files
+     */
+    public function test_download_selected_files_empty_area(): void {
+        global $USER;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $context = \context_user::instance($USER->id);
+        $draftitemid = file_get_unused_draft_itemid();
+
+        $selectedfiles = [
+            (object) [
+                'filename' => '',
+                'filepath' => '/',
+            ],
+        ];
+
+        $result = repository_download_selected_files($context, 'user', 'draft', $draftitemid, $selectedfiles);
+
+        $this->assertFalse($result);
+    }
+
     public function test_can_be_edited_by_user(): void {
         $this->resetAfterTest(true);
 
