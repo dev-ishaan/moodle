@@ -24,6 +24,27 @@ Feature: Course category management interface performs as expected
       | Manage courses                       | Courses                       | Cat 1             |
 
   @javascript
+  Scenario: Bulk move buttons require a selection
+    Given the following "categories" exist:
+      | name | category | idnumber |
+      | Cat 1 | 0 | CAT1 |
+      | Cat 2 | 0 | CAT2 |
+    And the following "courses" exist:
+      | fullname | shortname | category |
+      | Course 1 | C1 | CAT1 |
+    And I log in as "admin"
+    And I go to the courses management page
+    Then the "input[name='bulkmovecategories']" "css_element" should be disabled
+    And the "input[name='bulkmovecourses']" "css_element" should be disabled
+    When I click on "input[name='bcat[]']" "css_element"
+    Then the "input[name='bulkmovecategories']" "css_element" should be enabled
+    And the "input[name='bulkmovecourses']" "css_element" should be disabled
+    When I click on "input[name='bcat[]']" "css_element"
+    Then the "input[name='bulkmovecategories']" "css_element" should be disabled
+    When I click on "input[name='bc[]']" "css_element"
+    Then the "input[name='bulkmovecourses']" "css_element" should be enabled
+
+  @javascript
   Scenario: Test view mode functionality
     Given the following "categories" exist:
       | name | category | idnumber |
