@@ -289,11 +289,11 @@ if ($action !== false && confirm_sesskey()) {
                 // Move courses out of the current category and into a new category.
                 // They must have specified a category.
                 required_param('categoryid', PARAM_INT);
-                $movetoid = required_param('movecoursesto', PARAM_INT);
                 $courseids = optional_param_array('bc', false, PARAM_INT);
-                if ($courseids === false) {
+                if (empty($courseids)) {
                     break;
                 }
+                $movetoid = required_param('movecoursesto', PARAM_INT);
                 $moveto = core_course_category::get($movetoid);
                 try {
                     // If this fails we want to catch the exception and report it.
@@ -311,6 +311,9 @@ if ($action !== false && confirm_sesskey()) {
                 }
             } else if ($bulkmovecategories) {
                 $categoryids = optional_param_array('bcat', array(), PARAM_INT);
+                if (empty($categoryids)) {
+                    break;
+                }
                 $movetocatid = required_param('movecategoriesto', PARAM_INT);
                 $movetocat = core_course_category::get($movetocatid);
                 $movecount = 0;

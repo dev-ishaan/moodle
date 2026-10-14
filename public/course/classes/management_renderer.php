@@ -61,6 +61,33 @@ class core_course_management_renderer extends plugin_renderer_base {
             ),
             'moodle'
         );
+
+        // Keep the bulk "Move" buttons disabled until at least one matching checkbox is selected.
+        $this->page->requires->js_amd_inline(<<<'JS'
+            (function() {
+                var form = document.getElementById('coursecat-management');
+                if (!form) {
+                    return;
+                }
+                var updatebutton = function(checkboxname, buttonname) {
+                    var hasselection = form.querySelector('input[name="' + checkboxname + '"]:checked') !== null;
+                    form.querySelectorAll('input[name="' + buttonname + '"]').forEach(function(button) {
+                        button.disabled = !hasselection;
+                    });
+                };
+                var refresh = function() {
+                    updatebutton('bcat[]', 'bulkmovecategories');
+                    updatebutton('bc[]', 'bulkmovecourses');
+                };
+                form.addEventListener('change', function(e) {
+                    if (e.target && e.target.classList && e.target.classList.contains('bulk-action-checkbox')) {
+                        refresh();
+                    }
+                });
+                refresh();
+            })();
+        JS
+        );
     }
 
     /**
@@ -456,7 +483,7 @@ class core_course_management_renderer extends plugin_renderer_base {
                 array('aria-labelledby' => 'moveselectedcategoriesto', 'class' => 'me-1')
             );
             $submit = array('type' => 'submit', 'name' => 'bulkmovecategories', 'value' => get_string('move'),
-                'class' => 'btn btn-secondary');
+                'class' => 'btn btn-secondary', 'disabled' => true);
             $html .= $this->detail_pair(
                 html_writer::span(get_string('moveselectedcategoriesto'), '', array('id' => 'moveselectedcategoriesto')),
                 $select . html_writer::empty_tag('input', $submit)
@@ -769,7 +796,7 @@ class core_course_management_renderer extends plugin_renderer_base {
                 array('aria-labelledby' => 'moveselectedcoursesto', 'class' => 'me-1')
             );
             $submit = array('type' => 'submit', 'name' => 'bulkmovecourses', 'value' => get_string('move'),
-                'class' => 'btn btn-secondary');
+                'class' => 'btn btn-secondary', 'disabled' => true);
             $html .= $this->detail_pair(
                 html_writer::span(get_string('moveselectedcoursesto'), '', array('id' => 'moveselectedcoursesto')),
                 $select . html_writer::empty_tag('input', $submit)
@@ -796,7 +823,7 @@ class core_course_management_renderer extends plugin_renderer_base {
             array('aria-labelledby' => 'moveselectedcoursesto')
         );
         $submit = array('type' => 'submit', 'name' => 'bulkmovecourses', 'value' => get_string('move'),
-            'class' => 'btn btn-secondary');
+            'class' => 'btn btn-secondary', 'disabled' => true);
         $html .= $this->detail_pair(
             html_writer::span(get_string('moveselectedcoursesto'), '', array('id' => 'moveselectedcoursesto')),
             $select . html_writer::empty_tag('input', $submit)
